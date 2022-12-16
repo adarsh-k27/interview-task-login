@@ -9,7 +9,7 @@ function InfiniteScroll() {
   const [multiple,setMultiple]=useState(1)
   const FetchData = async () => {
     const res = await axios.get(
-      "http://makeup-api.herokuapp.com/api/v1/products.json?brand=maybelline"
+      "https://makeup-api.herokuapp.com/api/v1/products.json?brand=maybelline"
     );
     if (res.status == 200) {
       setState([...state,...res.data]);
