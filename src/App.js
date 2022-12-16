@@ -1,23 +1,40 @@
-import logo from './logo.svg';
+import { useContext, useState,useEffect } from 'react';
+import { LoginUser } from './apiHelper';
+import {getAuth} from 'firebase/auth'
+import {app} from './firebase.config'
 import './App.css';
-
+import Login from './Login';
+import UserContext from './Context/index'
+import RouterWraper from './RoutWraper';
+import {useNavigate} from 'react-router-dom'
 function App() {
+  const firebaseAuth = getAuth(app);
+  const {UserLogin} =useContext(UserContext)
+  const [auth,setAuth]=useState(false)
+  const Navigate=useNavigate()
+  useEffect(() => {
+    const aUTHS=localStorage.getItem('auth')
+    if (localStorage.getItem("auth") == false) {
+      console.log("AUTH FALSE");
+      Navigate("/");
+    }
+    firebaseAuth.onAuthStateChanged((userCred) => {
+      if (userCred) {
+        userCred.getIdToken().then((token) => {
+          LoginUser(`Bearer ${token}`, UserLogin);
+        });
+      } else {
+        setAuth(false);
+        window.localStorage.setItem("auth", false);
+        UserLogin(null);
+        Navigate("/");
+      }
+    });
+  }, []);
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <RouterWraper setAuth={setAuth} />
     </div>
   );
 }
